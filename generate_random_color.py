@@ -90,6 +90,43 @@ def frame_generator(verbose, tempo):
         count += 1
         frame_time += frame_interval
 
+#================ Jack's Function ===============================
+def color(colorname): #just returns the "color" rgb value from the "colors" list above
+    if colorname == "black":
+        return colors[0]
+    if colorname == "blue":
+        return colors[1]
+    if colorname == "cyan":
+        return colors[2]
+    if colorname == "green":
+        return colors[3]
+    if colorname == "yellow":
+        return colors[4]
+    if colorname == "red":
+        return colors[5]
+    if colorname == "magenta":
+        return colors[6]
+    if colorname == "white":
+        return colors[7]
+    
+    def solidcolor(colordesired, duration): #takes the color you want the bridge to be and the duration you want it to be this color
+        numFrames = int(frame_rate*duration) #calculates number of frames
+
+        solidcolor = color(colordesired) #interprets the color input
+
+        color_array = np.full((frame_height, frame_width, 3), solidcolor, dtype=np.uint8) #creates an array of the colors in the shape of the bridge inputs specified
+
+        for _ in range(numFrames): 
+            yield color_array
+
+
+
+
+
+
+
+
+
 #================================================================
 # Write a video file in the default format.
 
