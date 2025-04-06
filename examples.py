@@ -75,6 +75,32 @@ def test_gradient():
     pbl.gradient(sky_blue, yellow, 10, slices=pbl.get_region(10, 30, 120))
     pbl.save('test_gradient')
 
+def test_fade_to_color():
+    pbl = PauschBridge()
+    pbl.solid_color((255, 120, 0), end_time=20)
+    pbl.wave_paint(
+    highlight_rgb=(28, 74, 148),
+    end_time=20,
+    start_time=0,
+    base_rgb=(-1, -1, -1),
+    speed=10,               
+    width=0.05            
+    )
+    pbl.save("wavertol_20s")
+
+def test_fighting_colors():
+    pbl = PauschBridge()
+    pbl.solid_color((255,120,0), end_time=20)
+    pbl.wave_function_fill(
+        highlight_rgb=(0, 0, 255),
+        start_time=0,
+        end_time=20,
+        base_rgb=(-1, -1, -1),  # don't overwrite the background
+        )
+    pbl.save("cosine_wave_fill")
+
+
+
 
 def test_fading_jitter():
     pbl = PauschBridge()
@@ -93,7 +119,6 @@ def test_fading_jitter():
     jitter = 100
     sparkle_frame_duration = 3
     num_sparkles_per_frame = 15
-    
 
     pbl.faded_jitter_background_gradient(
             start_time=start_time,
@@ -109,6 +134,39 @@ def test_fading_jitter():
     # Save the result
     pbl.save('p1-test_fading_jitter')
     
+def showpreview():
+    pbl = PauschBridge()
+    pbl.faded_jitter_background_gradient(
+            start_time=0,
+            end_time=10,
+            base_rgb=(255,191,0),
+            final_rgb=(255, 120, 0),
+            jitter=100,
+            sparkle_frame_duration=3,
+            num_sparkles_per_frame=15,            
+        )
+    pbl.solid_color((255, 120, 0), start_time=10, end_time=30)
+    pbl.wave_paint(
+            highlight_rgb=(28, 74, 148),
+            end_time=30,
+            start_time=10,
+            base_rgb=(-1, -1, -1),
+            speed=10,               
+            width=0.05            
+        )
+    pbl.solid_color((255,120,0), start_time=30, end_time=50)
+    pbl.wave_function_fill(
+        highlight_rgb=(0, 0, 255),
+        start_time=30,
+        end_time=50,
+        base_rgb=(-1, -1, -1),  # don't overwrite the background
+        )
+    pbl.save("previewvideo")
+
+
+
+
+
 if __name__ == '__main__':
     # test_wave()
     # test_sparkle()
@@ -117,5 +175,8 @@ if __name__ == '__main__':
     # simple_test()
     # colorblock_test()
     # region_select_test()
-    test_fading_jitter()
+    #test_fading_jitter()
+    #test_fade_to_color()
+    #test_fighting_colors()
     # test_gradient()
+    showpreview()

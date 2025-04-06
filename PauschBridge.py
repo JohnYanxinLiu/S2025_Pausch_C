@@ -379,6 +379,9 @@ class PauschBridge:
         def lerp_rgb(rgb_start, rgb_end, t: float):
             return tuple(int(rgb_start[i] + (rgb_end[i] - rgb_start[i]) * t) for i in range(3))
 
+
+    
+
         def gen_jitter_sparkles(num_frames):
             active_sparkles = {}
 
@@ -428,44 +431,79 @@ class PauschBridge:
         )
 
         return self
+    def wave_paint(self, highlight_rgb: RGB, end_time: int, start_time: int = 0,
+               base_rgb: RGB = (-1, -1, -1), slices: list[Indices] = None,
+               width: float = 0.1, speed: int = 30, start_pos=bridge_width):
+        ''' effect that paints the bridge with a wave that moves right-to-left and leaves behind color
+        :param highlight_rgb: RGB values of the desired wave color
+        :param end_time:      time (sec) of effect end
+        :param start_time:    [optional] time (sec) of effect start
+        :param base_rgb:      [optional] RGB values of the background
+        :param slices:        [optional] subset of the bridge to apply effect to
+        :param width:         fraction of the bridge width as wave width (e.g., 0.1 for 10%)
+        :param speed:         speed of the wave in pixels/sec
+        :param start_pos:     [optional] start pos (default: far right)
+        '''
 
-
-
-
-    def wave(self, highlight_rgb: RGB, end_time: int, start_time: int = 0, base_rgb: RGB = (-1, -1, -1), slices: list[Indices] = None, width: float = 0.1, speed: int = 30, start_pos=0) -> np.matrix:
-        ''' effect that displays a wave of desired color & width on a base color
-            :param highlight_rgb:   RGB values of the desired wave color
-            :param end_time:        time (sec) of effect end
-            :param start_time:      [optional] time (sec) of effect start
-            :param base_rgb:        [optional] RGB values of the desired base color. If not specified, will overlay wave on top of existing color in frames
-            :param slices:          [optional] list of the subset of the frame to display effect on, defaults to whole frame
-            :param width:           desired width of wave in relation to bridge width, i.e. 0.5 means half the bridge width
-            :param speed:           desired speed of wave in pixels / second '''
-
-        def gen_wave(start_frame, end_frame, wave_width):
+        def gen_wave_paint(num_frames, wave_width):
             dims = tuple([end - start for start, end in slices[0]])
-            frame = np.full(dims, base_rgb, dtype=dtype)
             wave_pos = start_pos
-            for _ in range(start_frame, end_frame):
-                wave_pos += speed / frame_rate
-                wave_index = round(wave_pos)
-                wave_start = max(wave_index - wave_width, 0)
-                wave_end = wave_index
-                frame[:, 0:wave_start, :] = base_rgb
-                frame[:, wave_start:wave_end, :] = highlight_rgb
+            min_wave_reach = bridge_width  # How far left the wave has reached
 
-                if wave_start >= bridge_width:  # the wave has gone through the whole bridge, start over
-                    wave_pos = 0
+            for _ in range(num_frames):
+                wave_pos -= speed / frame_rate
+                wave_index = round(wave_pos)
+                wave_start = wave_index
+                wave_end = min(wave_index + wave_width, bridge_width)
+                min_wave_reach = min(min_wave_reach, wave_start)
+
+                frame = np.full(dims, base_rgb, dtype=dtype)
+                frame[:, min_wave_reach:, :] = highlight_rgb
                 yield frame
 
-        start_frame, end_frame, slices = self._effect_params(
-            start_time, end_time, slices)
+        start_frame, end_frame, slices = self._effect_params(start_time, end_time, slices)
+        wave_width = int(width * bridge_width)
+        num_frames = end_frame - start_frame
 
-        wave_width = int(width * bridge_width)  # in pixels
+        self.set_values(slices, gen_wave_paint(num_frames, wave_width), start_time, end_time)
 
-        self.set_values(slices, gen_wave(
-            start_frame, end_frame, wave_width), start_time, end_time)
+        return self
 
+    def wave_function_fill(self, 
+                       highlight_rgb: RGB, 
+                       end_time: int, 
+                       start_time: int = 0,
+                       base_rgb: RGB = (-1, -1, -1), 
+                       slices: list[Indices] = None,
+                       function=None):
+        ''' Draws a wave whose front follows a custom function. All LEDs to the right of that front are filled.
+        :param highlight_rgb:  RGB value of the wave fill
+        :param end_time:       end time of effect (seconds)
+        :param start_time:     start time of effect (seconds)
+        :param base_rgb:       base/background color, or (-1,-1,-1) to leave unchanged
+        :param slices:         optional region of the bridge
+        :param function:       a function f(t: float) -> float returning wave x-position at time t (in seconds)
+    '''
+        def gen_function_wave(num_frames, duration):
+            dims = tuple([end - start for start, end in slices[0]])
+            times = np.linspace(start_time, end_time, num_frames)
+
+            for t in times:
+                x_pos = int(function(t))  # where the wave front is now
+                frame = np.full(dims, base_rgb, dtype=dtype)
+                if x_pos < bridge_width:
+                    frame[:, x_pos:, :] = highlight_rgb
+                yield frame
+
+        start_frame, end_frame, slices = self._effect_params(start_time, end_time, slices)
+        num_frames = end_frame - start_frame
+
+        # default cosine wave function: oscillates back and forth over full width
+        if function is None:
+            frequency = 0.05  # 1 cycle every 4 seconds
+            function = lambda t: bridge_width * np.cos(2 * np.pi * frequency * t)
+
+        self.set_values(slices, gen_function_wave(num_frames, end_time - start_time), start_time, end_time)
         return self
 
     def color_block(self, palette: list[RGB], end_time: int, start_time: int = 0, slices: list[Indices] = None, width: int = 4, speed: int = 30):
