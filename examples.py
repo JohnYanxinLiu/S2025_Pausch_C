@@ -84,10 +84,27 @@ def test_fading_jitter():
     # pbl.solid_color(amber_rgb, 10)
 
     # Add a faded jitter sparkle effect on top with slight variation
-    jitter_amount = 100  # very subtle jitter
 
-    pbl.faded_jitter(
-        start_time=0, end_time=20, base_rgb=amber_rgb, jitter=jitter_amount)
+    end_time = 10
+    start_time = 0
+    base_rgb = (255, 191, 0)  # amber
+    final_rgb = (255, 120, 0)  # orange-red
+    # slices = pbl.get_region(0, 0, 100)  # Apply to the entire region
+    jitter = 100
+    sparkle_frame_duration = 3
+    num_sparkles_per_frame = 15
+    
+
+    pbl.faded_jitter_background_gradient(
+            start_time=start_time,
+            end_time=end_time,
+            base_rgb=base_rgb,
+            final_rgb=final_rgb,
+            # slices=slices,
+            jitter=jitter,
+            sparkle_frame_duration=sparkle_frame_duration,
+            num_sparkles_per_frame=num_sparkles_per_frame,            
+        )
 
     # Save the result
     pbl.save('p1-test_fading_jitter')

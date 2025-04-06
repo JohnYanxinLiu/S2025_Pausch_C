@@ -352,79 +352,83 @@ class PauschBridge:
 
         return self
     
-    def faded_jitter(self, end_time: int, start_time: int = 0, base_rgb: RGB = (0, 0, 0), slices: list[Indices] = None, jitter: int = 0, sparkle_frame_duration: int = 50, num_sparkles_per_frame: int = 15):
-        '''Effect that creates sparkles by gradually shifting pixels from the base color
-        to a jittered version and then fading them back to the base color.
+    def faded_jitter_background_gradient(
+        self,
+        end_time: int,
+        start_time: int = 0,
+        base_rgb: RGB = (0, 0, 0),
+        final_rgb: RGB = (0, 0, 0),
+        slices: list[Indices] = None,
+        jitter: int = 0,
+        sparkle_frame_duration: int = 50,
+        num_sparkles_per_frame: int = 15,
+        sparkle_spawn_interval: int = 3 # NEW
+    ):
+        ''' Subtle sparkle effect with a base background color that fades into a final color.
 
-        :param end_time:        Time (sec) of effect end
-        :param start_time:      [optional] Time (sec) of effect start
-        :param base_rgb:        [optional] RGB values of the base color (defaults to black)
-        :param slices:          [optional] List of subset of the frame to display the effect on
-        :param jitter:          [optional] Max RGB jitter (0–255) applied to sparkles
-        :param sparkle_frame_duration: [optional] Total frames for a sparkle’s full fade-in/out cycle
-        :param num_sparkles_per_frame: [optional] How many sparkles to generate at once
+            :param end_time:                 time (sec) when the effect ends
+            :param start_time:              [optional] time (sec) when the effect starts
+            :param base_rgb:                [optional] starting background color
+            :param final_rgb:               final background color to fade into
+            :param slices:                  [optional] subset of frame to apply effect on
+            :param jitter:                  [optional] max jitter (±value) per RGB channel
+            :param sparkle_frame_duration:  [optional] lifespan (frames) of each sparkle
+            :param num_sparkles_per_frame:  [optional] new sparkles to generate every sparkle cycle
         '''
 
-        def gen_sparkles(num_frames):
-            sparkles = {}
+        def lerp_rgb(rgb_start, rgb_end, t: float):
+            return tuple(int(rgb_start[i] + (rgb_end[i] - rgb_start[i]) * t) for i in range(3))
+
+        def gen_jitter_sparkles(num_frames):
+            active_sparkles = {}
 
             for frame_i in range(num_frames):
-                if frame_i % sparkle_frame_duration == 0:
+                t = frame_i / (num_frames - 1)
+                current_bg = lerp_rgb(base_rgb, final_rgb, t)
+
+                # Add new sparkles every sparkle_frame_duration frames
+                if frame_i % sparkle_spawn_interval == 0:
                     for _ in range(num_sparkles_per_frame):
                         row = rd.randrange(bridge_height)
                         col = rd.randrange(bridge_width)
-                        # Pick target jittered RGB once at creation
-                        target = tuple(
-                            max(0, min(255, c + rd.randint(-jitter, jitter)))
-                            for c in base_rgb
-                        )
-                        sparkles[(row, col)] = {
-                            'lifetime': sparkle_frame_duration,
-                            'target': target,
-                            'age': 0
+                        jitter_rgb = tuple(current_bg[i] + rd.randint(-jitter, jitter) for i in range(3))
+                        # Ensure the RGB values are within valid range
+                        jitter_rgb = tuple(max(0, min(255, val)) for val in jitter_rgb)
+                        # Add the sparkle with a TTL
+                        active_sparkles[(row, col)] = {
+                            "rgb": jitter_rgb,
+                            "ttl": sparkle_frame_duration
                         }
 
+                # Build frame
                 frame = np.full((bridge_height, bridge_width, 3),
-                                base_rgb, dtype=dtype)
+                                current_bg, dtype=dtype)
 
-                to_remove = []
+                expired_keys = []
+                for (row, col), sparkle in active_sparkles.items():
+                    if sparkle["ttl"] <= 0:
+                        expired_keys.append((row, col))
+                        continue
 
-                for (row, col), data in sparkles.items():
-                    age = data['age']
-                    total = data['lifetime']
-                    target = data['target']
+                    sparkle["ttl"] -= 1
+                    frame[row, col, :] = sparkle["rgb"]
 
-                    # Use a triangle wave: fade in (0 -> 0.5), fade out (0.5 -> 0)
-                    progress = age / total
-                    if progress <= 0.5:
-                        alpha = progress * 2  # 0 → 1
-                    else:
-                        alpha = (1 - progress) * 2  # 1 → 0
-
-                    # Interpolate between base and target color
-                    color = tuple(
-                        int((1 - alpha) * base + alpha * tgt)
-                        for base, tgt in zip(base_rgb, target)
-                    )
-
-                    frame[row, col, :] = color
-                    data['age'] += 1
-
-                    if data['age'] >= total:
-                        to_remove.append((row, col))
-
-                for key in to_remove:
-                    del sparkles[key]
+                for key in expired_keys:
+                    del active_sparkles[key]
 
                 yield frame
 
-        start_frame, end_frame, slices = self._effect_params(
-            start_time, end_time, slices)
+        start_frame, end_frame, slices = self._effect_params(start_time, end_time, slices)
 
-        self.set_values(slices, gen_sparkles(end_frame - start_frame),
-                        start_time, end_time)
+        self.set_values(
+            slices,
+            gen_jitter_sparkles(end_frame - start_frame),
+            start_time,
+            end_time
+        )
 
         return self
+
 
 
 
