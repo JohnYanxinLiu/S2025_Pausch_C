@@ -16,6 +16,7 @@ def test_sparkle():
     pbl.save('test_sparkle')
 
 
+
 def test_sprite():
     pbl = PauschBridge()
     pbl.solid_color((255, 0, 0), 10)
@@ -75,11 +76,29 @@ def test_gradient():
     pbl.save('test_gradient')
 
 
+def test_fading_jitter():
+    pbl = PauschBridge()
+
+    # Set a solid amber background (warm, earthy tone)
+    amber_rgb = (255, 191, 0)
+    # pbl.solid_color(amber_rgb, 10)
+
+    # Add a faded jitter sparkle effect on top with slight variation
+    jitter_amount = 100  # very subtle jitter
+
+    pbl.faded_jitter(
+        start_time=0, end_time=20, base_rgb=amber_rgb, jitter=jitter_amount)
+
+    # Save the result
+    pbl.save('p1-test_fading_jitter')
+    
 if __name__ == '__main__':
-    test_wave()
-    test_sparkle()
-    test_sprite()
-    test_wave_top()
-    simple_test()
-    colorblock_test()
-    region_select_test()
+    # test_wave()
+    # test_sparkle()
+    # test_sprite()
+    # test_wave_top()
+    # simple_test()
+    # colorblock_test()
+    # region_select_test()
+    test_fading_jitter()
+    # test_gradient()

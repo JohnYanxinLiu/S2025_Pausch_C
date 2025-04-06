@@ -351,6 +351,82 @@ class PauschBridge:
             end_frame - start_frame), start_time, end_time)
 
         return self
+    
+    def faded_jitter(self, end_time: int, start_time: int = 0, base_rgb: RGB = (0, 0, 0), slices: list[Indices] = None, jitter: int = 0, sparkle_frame_duration: int = 50, num_sparkles_per_frame: int = 15):
+        '''Effect that creates sparkles by gradually shifting pixels from the base color
+        to a jittered version and then fading them back to the base color.
+
+        :param end_time:        Time (sec) of effect end
+        :param start_time:      [optional] Time (sec) of effect start
+        :param base_rgb:        [optional] RGB values of the base color (defaults to black)
+        :param slices:          [optional] List of subset of the frame to display the effect on
+        :param jitter:          [optional] Max RGB jitter (0–255) applied to sparkles
+        :param sparkle_frame_duration: [optional] Total frames for a sparkle’s full fade-in/out cycle
+        :param num_sparkles_per_frame: [optional] How many sparkles to generate at once
+        '''
+
+        def gen_sparkles(num_frames):
+            sparkles = {}
+
+            for frame_i in range(num_frames):
+                if frame_i % sparkle_frame_duration == 0:
+                    for _ in range(num_sparkles_per_frame):
+                        row = rd.randrange(bridge_height)
+                        col = rd.randrange(bridge_width)
+                        # Pick target jittered RGB once at creation
+                        target = tuple(
+                            max(0, min(255, c + rd.randint(-jitter, jitter)))
+                            for c in base_rgb
+                        )
+                        sparkles[(row, col)] = {
+                            'lifetime': sparkle_frame_duration,
+                            'target': target,
+                            'age': 0
+                        }
+
+                frame = np.full((bridge_height, bridge_width, 3),
+                                base_rgb, dtype=dtype)
+
+                to_remove = []
+
+                for (row, col), data in sparkles.items():
+                    age = data['age']
+                    total = data['lifetime']
+                    target = data['target']
+
+                    # Use a triangle wave: fade in (0 -> 0.5), fade out (0.5 -> 0)
+                    progress = age / total
+                    if progress <= 0.5:
+                        alpha = progress * 2  # 0 → 1
+                    else:
+                        alpha = (1 - progress) * 2  # 1 → 0
+
+                    # Interpolate between base and target color
+                    color = tuple(
+                        int((1 - alpha) * base + alpha * tgt)
+                        for base, tgt in zip(base_rgb, target)
+                    )
+
+                    frame[row, col, :] = color
+                    data['age'] += 1
+
+                    if data['age'] >= total:
+                        to_remove.append((row, col))
+
+                for key in to_remove:
+                    del sparkles[key]
+
+                yield frame
+
+        start_frame, end_frame, slices = self._effect_params(
+            start_time, end_time, slices)
+
+        self.set_values(slices, gen_sparkles(end_frame - start_frame),
+                        start_time, end_time)
+
+        return self
+
+
 
     def wave(self, highlight_rgb: RGB, end_time: int, start_time: int = 0, base_rgb: RGB = (-1, -1, -1), slices: list[Indices] = None, width: float = 0.1, speed: int = 30, start_pos=0) -> np.matrix:
         ''' effect that displays a wave of desired color & width on a base color
@@ -437,8 +513,9 @@ class PauschBridge:
                              frame_rate, (bridge_width, bridge_height))
 
         for frame in self.frames:
-            frame = np.uint8(frame.frame)
-            out.write(frame)
+            # Convert from RGB to BGR before writing
+            bgr_frame = cv.cvtColor(np.uint8(frame.frame), cv.COLOR_RGB2BGR)
+            out.write(bgr_frame)
 
         out.release()
 
