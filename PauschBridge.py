@@ -500,8 +500,9 @@ class PauschBridge:
 
         # default cosine wave function: oscillates back and forth over full width
         if function is None:
-            frequency = 0.05  # 1 cycle every 4 seconds
-            function = lambda t: bridge_width * np.cos(2 * np.pi * frequency * t)
+            A = bridge_width//2
+            frequency = 0.025  # 1 cycle every 40 seconds
+            function=lambda t: A + A* np.cos(2 * np.pi * (4 / 40) * t)
 
         self.set_values(slices, gen_function_wave(num_frames, end_time - start_time), start_time, end_time)
         return self
@@ -546,6 +547,57 @@ class PauschBridge:
             start_frame, end_frame), start_time, end_time)
 
         return self
+    
+    def wave_move_block(self,
+                    highlight_rgb: RGB,
+                    background_rgb: RGB,
+                    start_time: int,
+                    end_time: int,
+                    initial_pos: int,
+                    final_pos: int,
+                    block_width: int = 5,
+                    block_height: int = bridge_height,
+                    vertical_offset: int = 0,
+                    slices: list[Indices] = None):
+        ''' Moves a solid wave block (no trail) from initial to final x-position over time.
+            :param highlight_rgb:    RGB color of the block
+            :param background_rgb:   RGB color of background
+            :param start_time:       effect start time in seconds
+            :param end_time:         effect end time in seconds
+            :param initial_pos:      starting x-position of the block
+            :param final_pos:        ending x-position of the block
+            :param block_width:      width of the block in pixels (x direction)
+            :param block_height:     height of the block in pixels (y direction)
+            :param vertical_offset:  top offset to start the block vertically
+            :param slices:           optional region of the bridge
+        '''
+
+        def gen_block_motion(num_frames):
+            dims = tuple([end - start for start, end in slices[0]])
+            x_positions = np.linspace(initial_pos, final_pos, num_frames)
+
+            for x in x_positions:
+                frame = np.full(dims, background_rgb, dtype=dtype)
+
+                x_start = int(max(0, round(x)))
+                x_end = int(min(bridge_width, x_start + block_width))
+
+                y_start = vertical_offset
+                y_end = min(y_start + block_height, bridge_height)
+
+                frame[y_start:y_end, x_start:x_end, :] = highlight_rgb
+                yield frame
+
+        start_frame, end_frame, slices = self._effect_params(start_time, end_time, slices)
+        num_frames = end_frame - start_frame
+
+        self.set_values(slices, gen_block_motion(num_frames), start_time, end_time)
+
+        return self
+
+    
+
+
 
     def save(self, basename):
         ''' save frame output to .avi file
