@@ -165,22 +165,22 @@ def showpreview():
             sparkle_frame_duration=3,
             num_sparkles_per_frame=15,            
         )
-    pbl.solid_color((255, 120, 0), start_time=20, end_time=60)
+    pbl.solid_color((255, 120, 0), start_time=20, end_time=40)
     pbl.wave_paint(
             highlight_rgb=(28, 74, 148),
-            end_time=60,
+            end_time=40,
             start_time=20,
             base_rgb=(-1, -1, -1),
             speed=5.7,               
             width=0.05            
         )
     #phase 2
-    pbl.solid_color((28,74,148), start_time=60, end_time=120)
+    pbl.solid_color((28,74,148), start_time=40, end_time=50)
     pbl.wave_move_block( #car from gates, traveling the first 1/4 of the bridge
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=60,
-            end_time=70,
+            start_time=40,
+            end_time=50,
             initial_pos=0,
             final_pos=228//4,
             block_width=10,
@@ -190,8 +190,8 @@ def showpreview():
     pbl.wave_move_block( #car from gates, traveling the second 1/4 of the bridge
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=70,
-            end_time=80,
+            start_time=50,
+            end_time=60,
             initial_pos=228//4,
             final_pos=228//2,
             block_width=10,
@@ -201,8 +201,8 @@ def showpreview():
     pbl.wave_move_block( #car from purnell, traveling the first 1/4 of the bridge
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=70,
-            end_time=80,
+            start_time=50,
+            end_time=60,
             initial_pos=228,
             final_pos=228*3//4,
             block_width=10,
@@ -212,19 +212,19 @@ def showpreview():
     pbl.wave_move_block( #gates car, staying where it is for those 6 seconds
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=80,
-            end_time=86,
+            start_time=60,
+            end_time=66,
             initial_pos=228//2,
             final_pos=228//2,
             block_width=10,
             block_height= 8//2,                
             vertical_offset= 8//2               
         )
-    pbl.wave_move_block( #purnell car, staying where it is for those 8 seconds
+    pbl.wave_move_block( #purnell car, staying where it is for those 10? seconds
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=80,
-            end_time=88,
+            start_time=60,
+            end_time=70,
             initial_pos=228*3//4,
             final_pos=228*3//4,
             block_width=10,
@@ -234,8 +234,8 @@ def showpreview():
     pbl.wave_move_block( #this is the gates car, starting to move again
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=86,
-            end_time=96,
+            start_time=66,
+            end_time=76,
             initial_pos=228//2,
             final_pos=228,
             block_width=10,
@@ -245,8 +245,8 @@ def showpreview():
     pbl.wave_move_block( #this is the purnell car, staying where it is for those 8 seconds
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
-            start_time=88,
-            end_time=118,
+            start_time=68,
+            end_time=93,
             initial_pos=228*3//4,
             final_pos=0,
             block_width=10,
@@ -257,15 +257,17 @@ def showpreview():
     
 
     #phase 4 (sort of:)
-    pbl.solid_color((255,255,255), start_time=120, end_time=140)
+    pbl.solid_color((255,255,255), start_time=93, end_time=120)
     pbl.wave_function_fill(
         highlight_rgb=(28, 74, 148),
-        start_time=120,
-        end_time=140,
+        start_time=93,
+        end_time=120,
         base_rgb=(-1, -1, -1),  #no bg overlay
         )
     
     #phase 5:
+
+    
     pbl.save("previewvideo")
 
 
