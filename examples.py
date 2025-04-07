@@ -176,7 +176,7 @@ def showpreview():
         )
     #phase 2
     pbl.solid_color((28,74,148), start_time=60, end_time=120)
-    pbl.wave_move_block( #this is the first car from gates, traveling the first 1/4 of the bridge
+    pbl.wave_move_block( #car from gates, traveling the first 1/4 of the bridge
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
             start_time=60,
@@ -184,10 +184,10 @@ def showpreview():
             initial_pos=0,
             final_pos=228//4,
             block_width=10,
-            block_height= 8 // 2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8 // 2,                
+            vertical_offset= 8//2                
         )
-    pbl.wave_move_block( #this is the first car from gates, traveling the second 1/4 of the bridge
+    pbl.wave_move_block( #car from gates, traveling the second 1/4 of the bridge
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
             start_time=70,
@@ -195,10 +195,10 @@ def showpreview():
             initial_pos=228//4,
             final_pos=228//2,
             block_width=10,
-            block_height= 8//2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8//2,               
+            vertical_offset= 8//2                
         ) 
-    pbl.wave_move_block( #this is the first car from gates, traveling the first 1/4 of the bridge
+    pbl.wave_move_block( #car from purnell, traveling the first 1/4 of the bridge
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
             start_time=70,
@@ -206,10 +206,10 @@ def showpreview():
             initial_pos=228,
             final_pos=228*3//4,
             block_width=10,
-            block_height= 8//2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8//2,               
+            vertical_offset= 8//2                
         )
-    pbl.wave_move_block( #this is the gates car, staying where it is for those 6 seconds
+    pbl.wave_move_block( #gates car, staying where it is for those 6 seconds
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
             start_time=80,
@@ -217,10 +217,10 @@ def showpreview():
             initial_pos=228//2,
             final_pos=228//2,
             block_width=10,
-            block_height= 8//2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8//2,                
+            vertical_offset= 8//2               
         )
-    pbl.wave_move_block( #this is the purnell car, staying where it is for those 8 seconds
+    pbl.wave_move_block( #purnell car, staying where it is for those 8 seconds
             highlight_rgb=(237, 237, 26),
             background_rgb=(-1, -1, -1), #no bg overlay
             start_time=80,
@@ -228,8 +228,8 @@ def showpreview():
             initial_pos=228*3//4,
             final_pos=228*3//4,
             block_width=10,
-            block_height= 8//2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8//2,                
+            vertical_offset= 8//2                
         )
     pbl.wave_move_block( #this is the gates car, starting to move again
             highlight_rgb=(237, 237, 26),
@@ -239,8 +239,8 @@ def showpreview():
             initial_pos=228//2,
             final_pos=228,
             block_width=10,
-            block_height= 8//2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8//2,                
+            vertical_offset= 8//2                
         )
     pbl.wave_move_block( #this is the purnell car, staying where it is for those 8 seconds
             highlight_rgb=(237, 237, 26),
@@ -250,17 +250,22 @@ def showpreview():
             initial_pos=228*3//4,
             final_pos=0,
             block_width=10,
-            block_height= 8//2,                # half-height
-            vertical_offset= 8//2                # bottom half
+            block_height= 8//2,                
+            vertical_offset= 8//2             
         )
-    #phase 4 (sort of)
+    #phase 3:
+    
+
+    #phase 4 (sort of:)
     pbl.solid_color((255,255,255), start_time=120, end_time=140)
     pbl.wave_function_fill(
         highlight_rgb=(28, 74, 148),
         start_time=120,
         end_time=140,
-        base_rgb=(-1, -1, -1),  # don't overwrite the background
+        base_rgb=(-1, -1, -1),  #no bg overlay
         )
+    
+    #phase 5:
     pbl.save("previewvideo")
 
 
@@ -280,4 +285,3 @@ if __name__ == '__main__':
     #test_fighting_colors()
     # test_gradient()
     showpreview()
-    test_movingblock()
