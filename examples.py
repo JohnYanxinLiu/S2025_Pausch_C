@@ -184,7 +184,7 @@ def showpreview():
             initial_pos=0,
             final_pos=228//4,
             block_width=10,
-            block_height= 8 // 2,                
+            block_height= 8,                
             vertical_offset= 8//2                
         )
     pbl.wave_move_block( #car from gates, traveling the second 1/4 of the bridge
@@ -254,13 +254,24 @@ def showpreview():
             vertical_offset= 8//2             
         )
     #phase 3:
-    
-
+    pbl.solid_color((0,0,0),start_time=93,end_time=100)
+    pbl.block_move_fade(
+                            start_rgb=(0,0,0)
+                            end_rgb=(235, 157, 12)
+                            background_rgb=(-1,-1,-1)
+                            start_time=93
+                            end_time=100
+                            initial_pos=228//2
+                            final_pos=228//2
+                            block_width=10
+                            block_height=8
+                            vertical_offset=0
+                        )
     #phase 4 (sort of:)
-    pbl.solid_color((255,255,255), start_time=93, end_time=120)
+    pbl.solid_color((255,255,255), start_time=100, end_time=120)
     pbl.wave_function_fill(
         highlight_rgb=(28, 74, 148),
-        start_time=93,
+        start_time=100,
         end_time=120,
         base_rgb=(-1, -1, -1),  #no bg overlay
         )
@@ -270,6 +281,21 @@ def showpreview():
     
     pbl.save("previewvideo")
 
+def testblockmovefade(): 
+    pbl = PauschBridge()
+    pbl.block_move_fade(
+    start_rgb=(255, 0, 0),          # red
+    end_rgb=(0, 0, 255),            # blue
+    background_rgb=(0, 0, 0),       # black background
+    start_time=0,
+    end_time=10,
+    initial_pos=228,
+    final_pos=0,
+    block_width=10,
+    block_height=8//2,
+    vertical_offset=8//2  # bottom two rows
+)
+    pbl.save("fade_block_motion")
 
 
 
@@ -287,3 +313,4 @@ if __name__ == '__main__':
     #test_fighting_colors()
     # test_gradient()
     showpreview()
+    testblockmovefade()

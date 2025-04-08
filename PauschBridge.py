@@ -594,6 +594,61 @@ class PauschBridge:
         self.set_values(slices, gen_block_motion(num_frames), start_time, end_time)
 
         return self
+    
+    def block_move_fade(self,
+                         start_rgb: RGB,
+                         end_rgb: RGB,
+                         background_rgb: RGB,
+                         start_time: int,
+                         end_time: int,
+                         initial_pos: int,
+                         final_pos: int,
+                         block_width: int = 5,
+                         block_height: int = bridge_height,
+                         vertical_offset: int = 0,
+                         slices: list[Indices] = None):
+        ''' Moves a block from initial to final position while fading its color over time.
+            :param start_rgb:       initial RGB color of the block
+            :param end_rgb:         final RGB color of the block
+            :param background_rgb:  background color behind the block
+            :param start_time:      start time in seconds
+            :param end_time:        end time in seconds
+            :param initial_pos:     starting x-position of block
+            :param final_pos:       ending x-position of block
+            :param block_width:     width of the block
+            :param block_height:    height of the block
+            :param vertical_offset: top offset of the block
+            :param slices:          optional subset of the frame
+        '''
+
+        def lerp_rgb(a: RGB, b: RGB, t: float) -> RGB:
+            return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+        def gen_motion_fade(num_frames):
+            dims = tuple([end - start for start, end in slices[0]])
+            x_positions = np.linspace(initial_pos, final_pos, num_frames)
+
+            for i, x in enumerate(x_positions):
+                t = i / (num_frames - 1) if num_frames > 1 else 0
+                color = lerp_rgb(start_rgb, end_rgb, t)
+
+                frame = np.full(dims, background_rgb, dtype=dtype)
+
+                x_start = int(max(0, round(x)))
+                x_end = int(min(bridge_width, x_start + block_width))
+
+                y_start = vertical_offset
+                y_end = min(y_start + block_height, bridge_height)
+
+                frame[y_start:y_end, x_start:x_end, :] = color
+                yield frame
+
+        start_frame, end_frame, slices = self._effect_params(start_time, end_time, slices)
+        num_frames = end_frame - start_frame
+
+        self.set_values(slices, gen_motion_fade(num_frames), start_time, end_time)
+
+        return self
 
     
 
