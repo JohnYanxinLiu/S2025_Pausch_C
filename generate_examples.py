@@ -10,9 +10,9 @@ import random
 def main():
     PBL = AVIGenerator('test_video', frame_rate=30)
     # Add a solid color effect
-    PBL.add_effect(SolidColor(rgb=(255, 0, 0), start_time=0, end_time=5))
+    PBL.add_effect(SolidColor(rgb=(180, 0, 0), start_time=0, end_time=5))
     
-    PBL.add_effect(SlowColorTransition((255, 0, 0), (0, 0, 255), start_time=5, end_time=10))
+    PBL.add_effect(SlowColorTransition((180, 0, 0), (0, 0, 180), start_time=5, end_time=10))
     
     PBL.add_effect(SparkleJitter(
         jitter_val=50,
@@ -22,6 +22,16 @@ def main():
         sparkles_per_spawn=5,
         start_time=0, 
         end_time=10
+    ))
+    
+    PBL.add_effect(MovingWall(
+        color=(0, 0, 180),
+        start_time=0,
+        end_time=10,
+        x1=0,
+        y1=0,
+        x2=BRIDGE_WIDTH,
+        y2=BRIDGE_HEIGHT,
     ))
     
     PBL.save_video()

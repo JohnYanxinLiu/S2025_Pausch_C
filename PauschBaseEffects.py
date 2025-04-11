@@ -174,3 +174,30 @@ class SparkleJitter(Effect):
                             if 0 <= y + dy < BRIDGE_HEIGHT and 0 <= x + dx < BRIDGE_WIDTH:
                                 frames[i][y + dy][x + dx] = current_color
         return frames
+    
+    
+
+
+class MovingWall(Effect):
+    
+    def sin_pos_fn(t, amplitude=10):
+        return int(amplitude * np.sin(t / 10) + amplitude)
+        
+    def __init__(self, color, pos_fn=sin_pos_fn, from_left=True, start_time=0, end_time=0, x1=0, y1=0, x2=BRIDGE_WIDTH, y2=BRIDGE_HEIGHT, frame_rate=FRAME_RATE):
+        super().__init__(start_time, end_time, x1, y1, x2, y2, frame_rate)
+        self.color = color
+        self.from_left = from_left
+        self.pos_fn = pos_fn
+        
+    def generate_frames(self, frames=np.array([])):
+        frames = self.extend_frames_(frames)
+        
+        for i in range(self.start_frame, self.end_frame):
+            pos = self.pos_fn(t=i, amplitude=self.x2 - self.x1)
+            pos = np.clip(pos, self.x1, self.x2)
+            
+            if self.from_left:
+                frames[i][self.y1:self.y2, self.x1:pos] = self.color
+            else:
+                frames[i][self.y1:self.y2, pos:self.x2] = self.color
+        return frames
