@@ -203,3 +203,41 @@ class MovingWall(Effect):
             else:
                 frames[i][self.y1:self.y2, pos:self.x2] = self.color
         return frames
+    
+
+class MovingCars(Effect):
+    def __init__(self, start_rgb=(), end_rgb=(), start_pos=0, end_pos=0, height=0, width=0,
+                 start_time=0, end_time=0, x1=0, y1=0, x2=BRIDGE_WIDTH, y2=BRIDGE_HEIGHT, frame_rate=FRAME_RATE):
+        super().__init__(start_time, end_time, x1, y1, x2, y2, frame_rate)
+        self.start_rgb = np.array(start_rgb, dtype=float)
+        self.end_rgb = np.array(end_rgb, dtype=float)
+        self.start_pos = start_pos
+        self.end_pos = end_pos
+        self.height = height
+        self.width = width
+
+    def generate_frames(self, frames=np.array([])):
+        frames = self.extend_frames_(frames)
+
+        total_frames = self.end_frame - self.start_frame
+        for i in range(self.start_frame, self.end_frame):
+            t = (i - self.start_frame) / total_frames
+
+            # Linearly interpolate position
+            current_pos = int(self.start_pos + t * (self.end_pos - self.start_pos))
+
+            # Linearly interpolate color
+            current_rgb = (1 - t) * self.start_rgb + t * self.end_rgb
+            current_rgb = np.clip(current_rgb, 0, 255).astype(np.uint8)
+
+            # Draw the "car" as a rectangle at the current position
+            x_start = int(np.clip(current_pos, self.x1, self.x2 - self.width))
+            x_end = x_start + self.width
+            y_start = int(np.clip(self.y1, 0, BRIDGE_HEIGHT - self.height))
+            y_end = y_start + self.height
+
+            frames[i][y_start:y_end, x_start:x_end] = current_rgb
+
+        return frames
+
+    
