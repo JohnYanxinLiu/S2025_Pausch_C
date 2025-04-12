@@ -3,16 +3,16 @@ from PauschGenerator import *
 import numpy as np
 import cv2 as cv
 import random
+import math
 
 
 
 
 def main():
     PBL = AVIGenerator('test_video', frame_rate=30)
-    # Add a solid color effect
-    PBL.add_effect(SolidColor(rgb=(180, 0, 0), start_time=0, end_time=5))
+    np.random.seed(42)
     
-    PBL.add_effect(SlowColorTransition((180, 0, 0), (0, 0, 180), start_time=5, end_time=10))
+    PBL.add_effect(SlowColorTransition((220, 180, 0), (220, 120, 0), start_time=0, end_time=20))
     
     PBL.add_effect(SparkleJitter(
         jitter_val=50,
@@ -21,17 +21,32 @@ def main():
         spawn_rate=0.5,
         sparkles_per_spawn=5,
         start_time=0, 
-        end_time=10
+        end_time=20
     ))
+    
+    PBL.add_effect(SolidColor(rgb=(220, 120, 0), start_time=20, end_time=40))
+    
+    PBL.add_effect(SparkleJitter(
+        jitter_val=50,
+        radius=2,
+        time_to_live=0.8,
+        spawn_rate=0.5,
+        sparkles_per_spawn=5,
+        start_time=20, 
+        end_time=40
+    ))
+    
+    p1_wave_total_time = 20
+    def p1_wave_fn(t, amplitude):
+        theta = (t / p1_wave_total_time) * (math.pi / 2)
+        return (1.0-math.sin(theta)) * amplitude
     
     PBL.add_effect(MovingWall(
         color=(0, 0, 180),
-        start_time=0,
-        end_time=10,
-        x1=0,
-        y1=0,
-        x2=BRIDGE_WIDTH,
-        y2=BRIDGE_HEIGHT,
+        pos_fn=p1_wave_fn,
+        start_time=20,
+        end_time=40,
+        from_left=False
     ))
     
     PBL.save_video()

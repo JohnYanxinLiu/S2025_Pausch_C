@@ -16,7 +16,7 @@ FRAME_RATE = 30
 # generate new frames and append them to the end of the list.
 
 class Effect:
-    def __init__(self, start_time=0, end_time=0, x1=0, y1=0, x2=0, y2=0, frame_rate=FRAME_RATE):
+    def __init__(self, start_time=0, end_time=0, x1=0, y1=0, x2=BRIDGE_WIDTH, y2=BRIDGE_HEIGHT, frame_rate=FRAME_RATE):
         self.start_time = start_time
         self.start_frame = int(start_time * frame_rate)
         self.end_time = end_time
@@ -188,13 +188,15 @@ class MovingWall(Effect):
         self.color = color
         self.from_left = from_left
         self.pos_fn = pos_fn
-        
+
+
     def generate_frames(self, frames=np.array([])):
         frames = self.extend_frames_(frames)
         
         for i in range(self.start_frame, self.end_frame):
-            pos = self.pos_fn(t=i, amplitude=self.x2 - self.x1)
-            pos = np.clip(pos, self.x1, self.x2)
+            t = (i - self.start_frame)/self.frame_rate
+            pos = self.pos_fn(t=t, amplitude=self.x2 - self.x1)
+            pos = int(np.clip(pos, self.x1, self.x2))
             
             if self.from_left:
                 frames[i][self.y1:self.y2, self.x1:pos] = self.color
