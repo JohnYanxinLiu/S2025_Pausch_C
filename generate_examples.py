@@ -50,7 +50,18 @@ def main():
     ))
 
     PBL.add_effect(SolidColor(rgb=(0,0,180), start_time=40, end_time=60))
-    PBL.add_effect(MovingCars(start_rgb=(200,200,200),end_rgb=(200,200,0), start_pos=0, end_pos=BRIDGE_WIDTH//2, start_time=40, end_time=60))
+    PBL.add_effect(MovingCars(
+            start_rgb=(200,200,200),
+            end_rgb=(200,200,0), 
+            start_pos=0, 
+            end_pos=BRIDGE_WIDTH//2, 
+            start_time=40, 
+            end_time=60, 
+            width=20, 
+            height=BRIDGE_HEIGHT//2, 
+            y1=BRIDGE_HEIGHT//2, 
+            y2=BRIDGE_HEIGHT
+        ))
     
     PBL.save_video()
         

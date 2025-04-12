@@ -221,6 +221,7 @@ class MovingCars(Effect):
 
         total_frames = self.end_frame - self.start_frame
         for i in range(self.start_frame, self.end_frame):
+            # import pdb; pdb.set_trace()
             t = (i - self.start_frame) / total_frames
 
             # Linearly interpolate position
