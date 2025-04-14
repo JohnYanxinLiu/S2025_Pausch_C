@@ -17,7 +17,7 @@ def main():
     P2_START_TIME = 40
     P3_START_TIME = 115
     P4_START_TIME = 170
-    P5_START_TIME = 205
+    P5_START_TIME = 210
     
     
     PBL.add_effect(SlowColorTransition((220, 180, 0), (220, 120, 0), start_time=P1_START_TIME, end_time=P1_START_TIME+20))
@@ -222,12 +222,14 @@ def main():
     # Create the position function
     fighting_fn = make_p4_fighting_fn(transition_velocity)
 
-    PBL.add_effect(SolidColor(rgb=(180, 180, 180), start_time=P4_START_TIME, end_time=P5_START_TIME))
+    PBL.add_effect(SlowColorTransition(start_rgb=(255, 255, 255), end_rgb=(0, 0, 200), start_time=P4_START_TIME, end_time=P4_START_TIME+5, x1=0, x2=BRIDGE_WIDTH//2))
+    PBL.add_effect(SlowColorTransition(start_rgb=(255, 255, 255), end_rgb=(180, 180, 180), start_time=P4_START_TIME, end_time=P4_START_TIME+5, x1=BRIDGE_WIDTH//2, x2=BRIDGE_WIDTH))
+    PBL.add_effect(SolidColor(rgb=(180, 180, 180), start_time=P4_START_TIME+5, end_time=P5_START_TIME))
     # Add to your moving wall effect
     PBL.add_effect(MovingWall(
         color=(0, 0, 200),
         pos_fn=fighting_fn,
-        start_time=P4_START_TIME,
+        start_time=P4_START_TIME+5,
         end_time=P5_START_TIME-5,
     ))
     PBL.add_effect(SlowColorTransition(start_rgb=(180, 180, 180), end_rgb=(0, 0, 0), start_time=P5_START_TIME-5, end_time=P5_START_TIME))
