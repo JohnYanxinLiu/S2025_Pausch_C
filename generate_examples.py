@@ -18,6 +18,8 @@ def main():
     P3_START_TIME = 115
     P4_START_TIME = 170
     P5_START_TIME = 210
+
+    COMBUSTION_START_TIME = 600 #arb large number for now
     
     
     PBL.add_effect(SlowColorTransition((220, 180, 0), (220, 120, 0), start_time=P1_START_TIME, end_time=P1_START_TIME+20))
@@ -277,6 +279,59 @@ def main():
     #phase 1.6: flowers blooming
     #im tired rn, so not going to do this rn. also the randomization im a little confused abt ngl
 
+
+
+
+#combustion section, WIP!!!!
+    PBL.add_effect(SolidColor(rgb=(0,0,180), start_time=COMBUSTION_START_TIME, end_time=COMBUSTION_START_TIME+20)) #background
+    PBL.add_effect(MovingCars( #gates-side car, starts zoomin'
+        start_rgb=(200, 200, 0),
+        end_rgb=(200, 200, 0),
+        start_pos=0,
+        end_pos=228*3//4,
+        height=BRIDGE_HEIGHT//2,
+        width=10,
+        start_time=COMBUSTION_START_TIME,
+        end_time=COMBUSTION_START_TIME + 30,
+        y1=BRIDGE_HEIGHT//2,
+        y2=BRIDGE_HEIGHT
+    ))
+    PBL.add_effect(MovingCars( #purnell-side car, starts zoomin'
+        start_rgb=(200, 200, 0),
+        end_rgb=(200, 200, 0),
+        start_pos=228,
+        end_pos=228*3//4,
+        height=BRIDGE_HEIGHT//2,
+        width=10,
+        start_time=COMBUSTION_START_TIME + 5,
+        end_time= COMBUSTION_START_TIME + 30,
+        y1=BRIDGE_HEIGHT//2,
+        y2=BRIDGE_HEIGHT
+    ))
+    for i in range(0,11):
+        width=20+20*i
+        if i%2==0:
+            PBL.add_effect(MovingCars(
+                start_rgb=(235, 55, 19),
+                end_rgb=(235, 55, 19),
+                start_pos=228*3//4-width//2,
+                end_pos=228*3//4-width//2,
+                height=BRIDGE_HEIGHT,
+                width=width,
+                start_time=COMBUSTION_START_TIME+30+2*i,
+                end_time=COMBUSTION_START_TIME+30+24
+            ))
+        if i%2!=0:
+             PBL.add_effect(MovingCars(
+                start_rgb=(245, 162, 61),
+                end_rgb=(245, 162, 61),
+                start_pos=228*3//4-width//2,
+                end_pos=228*3//4-width//2,
+                height=BRIDGE_HEIGHT,
+                width=width,
+                start_time=COMBUSTION_START_TIME+30+2*i,
+                end_time=COMBUSTION_START_TIME+30+24
+            ))
     
 
     PBL.save_video()
