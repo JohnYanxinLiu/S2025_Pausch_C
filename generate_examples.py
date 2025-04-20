@@ -690,6 +690,30 @@ def main():
                bridge_width_start=0, bridge_width_end=BRIDGE_WIDTH,
                bridge_height_start=0, bridge_height_end=BRIDGE_HEIGHT, start_color=(0, 0, 0))
     
+    PBL.add_effect(FlickerInvertEffect(
+        flicker_prob=0.02,
+        min_spacing_sec=2,
+        flicker_blinks=4,
+        flicker_speed=2,  # frames between blinks
+        ttl=0.5,  # seconds to stay inverted
+        start_time=PHASE4_START_TIME,
+        end_time=PHASE4_SUB2_START_TIME+15,
+    ))
+    
+    PBL.add_effect(FlickerOutEffect(
+        radius=4, 
+        time_to_live=0.5,
+        flicker_duration=0.25,
+        spawn_rate=0.1,
+        sparkles_per_spawn=2,
+        base_rgb=None, 
+        start_time=PHASE4_START_TIME,
+        end_time=PHASE4_SUB2_START_TIME+15,
+        x1=0, y1=0, 
+        x2=BRIDGE_WIDTH, 
+        y2=BRIDGE_HEIGHT, 
+        frame_rate=FRAME_RATE
+    ))
     PBL.save_video()
     
     return
