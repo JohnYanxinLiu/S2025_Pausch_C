@@ -438,7 +438,7 @@ def subphase_5(PBL, start_time, end_time, bridge_width_start, bridge_width_end, 
                 start_rgb=current_color,
                 end_rgb=(0, 0, 0),
                 start_time=phase_end,
-                end_time=end_time,
+                end_time=end_time+2,
                 x1=bridge_width_start, x2=bridge_width_end,
                 y1=bridge_height_start, y2=bridge_height_end
             ))
@@ -686,7 +686,7 @@ def main():
                bridge_height_start=0, bridge_height_end=BRIDGE_HEIGHT)
 
     combustion_subphase(PBL, PHASE4_SUB2_START_TIME, PHASE4_SUB2_START_TIME+45, 0, BRIDGE_WIDTH, 0, BRIDGE_HEIGHT)
-    subphase_3(PBL, PHASE4_SUB2_START_TIME+40, PHASE4_SUB2_START_TIME+55,
+    subphase_3(PBL, PHASE4_SUB2_START_TIME+45, PHASE4_SUB2_START_TIME+60,
                bridge_width_start=0, bridge_width_end=BRIDGE_WIDTH,
                bridge_height_start=0, bridge_height_end=BRIDGE_HEIGHT, start_color=(0, 0, 0))
     
